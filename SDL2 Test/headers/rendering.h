@@ -63,14 +63,29 @@ public:
 
 
 	SDL_Texture_PTR texture;
-private:
+protected:
 	SDL_Renderer* renderer;
 	int width;
 	int height;
 
 };
 
+class AnimatedSprite : public Texture {
+public:
+	AnimatedSprite(SDL_Renderer* renderer, int frames, int frame_width, int frame_height)						: Texture(renderer), frames(frames), frame_width(frame_width), frame_height(frame_height) {};
+	AnimatedSprite(SDL_Renderer* renderer, std::string& path, int frames, int frame_width, int frame_height)	: Texture(renderer, path), frames(frames), frame_width(frame_width), frame_height(frame_height) {};
+	AnimatedSprite(SDL_Renderer* renderer, const char* path, int frames, int frame_width, int frame_height)		: Texture(renderer, path), frames(frames), frame_width(frame_width), frame_height(frame_height) {};
+	~AnimatedSprite() = default;
 
+	void renderAt(int x, int y, float angle, SDL_RendererFlip flip, bool animated);
+
+private:
+	int frames;
+	int frame_width;
+	int frame_height;
+	//int frame_offset;
+
+};
 
 
 

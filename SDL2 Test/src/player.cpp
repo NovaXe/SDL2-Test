@@ -6,12 +6,21 @@ Player::Player(float x, float y): rx(x), ry(y), vx(0), vy(0), ax(0), ay(0)
 {
 	//this->renderer = renderer;
     this->walk_speed = 10; // m/s
-    this->base_acceleration = 0.015; // m/s^2
+    this->base_acceleration = 0.005; // m/s^2
     this->static_friction = 0.012; // m/s^2
-    this->kinetic_friction = 0.014;
+    this->drag = 0.014;
 }
 
+void Player::set_sprites(std::shared_ptr<AnimatedSprite> horizontal, std::shared_ptr<AnimatedSprite> vertical) {
+    if (horizontal != NULL) {
+        this->horizontal_sprite = horizontal;
+    }
 
+    if (vertical != NULL) {
+        this->vertical_sprite = vertical;
+    }
+
+}
 
 void Player::handleEvent(SDL_Event& e)
 {
@@ -58,25 +67,33 @@ void Player::move(float delta_time)
 
     float accel_x = 0;
     float accel_y = 0;
-    if (vx > 0) {
-        accel_x = ax - kinetic_friction;
-    }
-    else if (vx < 0) {
-        accel_x = ax + kinetic_friction;
-    }
-    else {
-        accel_x = ax;
-    }
 
-    if (vy > 0) {
-        accel_y = ay - kinetic_friction;
-    }
-    else if (vy < 0) {
-        accel_y = ay + kinetic_friction;
-    }
-    else {
-        accel_y = ay;
-    }
+    accel_x = ax - drag * vx;
+    accel_y = ay - drag * vy;
+
+
+    //if (vx > 0) {
+    //    accel_x = ax - drag;
+    //}
+    //else if (vx < 0) {
+    //    accel_x = ax + drag;
+    //}
+    //else {
+    //    accel_x = ax;
+    //}
+
+    //if (vy > 0) {
+    //    accel_y = ay - drag;
+    //}
+    //else if (vy < 0) {
+    //    accel_y = ay + drag;
+    //}
+    //else {
+    //    accel_y = ay;
+    //}
+
+
+
 
     
     /*vx = (rx - old_x) / delta_time;
@@ -85,50 +102,54 @@ void Player::move(float delta_time)
     old_y = ry;*/
 
 
+    vx = delta_time * accel_x;
+    vy = delta_time * accel_y;
+
+
     rx += vx * delta_time + accel_x * 0.5 * pow(delta_time, 2);
     ry += vy * delta_time + accel_y * 0.5 * pow(delta_time, 2);
+
+    
 
     
 }
 
 
 
-void Player::render(Texture* sprite)
+void Player::render()
 {
-    auto [width, height] = sprite->getDimensions();
-    static int frame = 0;
-    int tot_frames = 2;
+    //SDL_RendererFlip flip = SDL_FLIP_NONE;
+    //if (this->ax < 0) {
+    //    flip = SDL_FLIP_HORIZONTAL;
+    //}
+    static bool last_dir_vert = false;
+    
+    if (std::abs(this->vy) > std::abs(this->vx)) {
+        last_dir_vert = true;
+    }
+    else if  (std::abs(this->vy) < std::abs(this->vx)) {
+        last_dir_vert = false;
+    }
+    
+
+    bool vert_animated = bool(this->vy);
+    bool horiz_animated = bool(this->vx);
 
 
 
-    SDL_Rect clips[4] = {
-        {0, 0, 64, 64},
-        {64, 0, 64, 64},
-        {128, 0, 64, 64},
-        {192, 0, 64, 64},
-    };
 
-    int clip = 0;
-    if (this->ax != 0.0f) {
-        clip = 2 + frame;
-        printf("%d\r", frame);
+    if (last_dir_vert) {
+        this->vertical_sprite->renderAt(rx-32, ry-32, 0, SDL_FLIP_NONE, vert_animated);
     }
     else {
-        frame = 0;
-        clip = 0;
+        this->horizontal_sprite->renderAt(rx-32, ry-32, 0, SDL_FLIP_NONE, horiz_animated);
     }
 
-    SDL_RendererFlip flip = SDL_FLIP_NONE;
-    if (this->ax < 0) {
-        flip = SDL_FLIP_HORIZONTAL;
-    }
-
-    frame++;
-    if (frame / 2 > tot_frames) {
-        frame = 0;
-    }
-    sprite->renderAt(rx - clips[clip].w/2, ry - clips[clip].h / 2, &clips[clip], 0, flip);
 }
+
+
+
+
 
 void Player::setPos(float x, float y)
 {

@@ -11,19 +11,25 @@ public:
 	float walk_speed;
 	float base_acceleration;
 	float static_friction;
-	float kinetic_friction;
+	float drag;
 
 	void move(float delta_time);
 
-	void render(Texture* sprite);
+	void render();
 	void setPos(float x, float y);
 
 	std::tuple<float, float> getPos();
+	void set_sprites(std::shared_ptr<AnimatedSprite> horizontal, std::shared_ptr<AnimatedSprite> vertical);
 
 
 private:
 	//SDL_Renderer* renderer;
 	//Texture* sprite;
+
+	std::shared_ptr<AnimatedSprite> horizontal_sprite;
+	std::shared_ptr<AnimatedSprite> vertical_sprite;
+
+
 	float rx, ry;
 
 	float vx, vy;

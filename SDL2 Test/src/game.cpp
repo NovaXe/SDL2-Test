@@ -12,8 +12,7 @@
 #define DEFAULT_WINDOW_HEIGHT 600
 
 
-Game::Game() : windowInstance() {
-    this->isRunning = true;
+Game::Game() : windowInstance(), isRunning(true) {
     
     this->windowInstance.init();
     this->renderer = this->windowInstance.createRenderer();
@@ -48,6 +47,8 @@ bool Game::init() {
     auto [window_width, window_height] = this->windowInstance.getDimensions();
 
     this->player = std::make_unique<Player>(window_width / 2, window_height / 2);
+    this->player->set_sprites(this->animated_sprites["tank_move_horizontal"], this->animated_sprites["tank_move_vertical"]);
+
     return true;
 }
 
@@ -99,16 +100,20 @@ void Game::logicUpdate(float delta_time) {
 
 
 void Game::loadMedia() {
-    auto path = "media";
+    /*auto path = "media";
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
         std::string file_path = entry.path().generic_string();
         auto texture = std::make_unique<Texture>(this->renderer.get());
         texture->loadFromFile(file_path);
         this->images.push_back(std::move(texture));
-    }
+    }*/
 
-    this->sprites["smug"] = std::make_unique<Texture>(this->renderer.get(), "sprites/smug.png");
-    this->sprites["player"] = std::make_unique<Texture>(this->renderer.get(), "sprites/player.png");
+    //this->sprites["smug"] = std::make_unique<Texture>(this->renderer.get(), "sprites/smug.png");
+    //this->sprites["player"] = std::make_unique<Texture>(this->renderer.get(), "sprites/player.png");
+
+
+    this->animated_sprites["tank_move_horizontal"] = std::make_unique<AnimatedSprite>(this->renderer.get(), "sprites/tank/tank_horizontal.png", 4, 64, 64);
+    this->animated_sprites["tank_move_vertical"] = std::make_unique<AnimatedSprite>(this->renderer.get(), "sprites/tank/tank_vertical.png", 4, 64, 64);
 
 
 
@@ -164,27 +169,33 @@ void Game::processEvents() {
 
 
 void Game::render() {
+    SDL_SetRenderDrawColor(this->renderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(this->renderer.get());
 
-    static int old_width, old_height;
-    int new_width, new_height;
-    std::tie(new_width, new_height) = this->images.at(this->current_image)->getDimensions();
+    //static int old_width, old_height;
+    //int new_width, new_height;
+    //std::tie(new_width, new_height) = this->images.at(this->current_image)->getDimensions();
 
-    //SDL_QueryTexture(.get(), NULL, NULL, &new_width, &new_height);
+    ////SDL_QueryTexture(.get(), NULL, NULL, &new_width, &new_height);
 
-    if (new_width != old_width || new_height != old_height) {
-        old_width = new_width;
-        old_height = new_height;
-        //SDL_HideWindow(this->window.get());
-        this->windowInstance.setSize(old_width, old_height);
-        this->windowInstance.centerOnScreen();
-        printf("%d, %d\n", old_width, old_height);
+    //if (new_width != old_width || new_height != old_height) {
+    //    old_width = new_width;
+    //    old_height = new_height;
+    //    //SDL_HideWindow(this->window.get());
+    //    this->windowInstance.setSize(old_width, old_height);
+    //    this->windowInstance.centerOnScreen();
+    //    printf("%d, %d\n", old_width, old_height);
 
-        //SDL_ShowWindow(this->window.get());
+    //    //SDL_ShowWindow(this->window.get());
 
-    }
-    this->images.at(this->current_image)->renderAt(0, 0, NULL, 0, SDL_FLIP_NONE);
-    this->player->render(this->sprites["player"].get());
+    //}
+    //this->images.at(this->current_image)->renderAt(0, 0, NULL, 0, SDL_FLIP_NONE);
+
+
+
+    
+
+    this->player->render();
     //this->images.at(3).get()
 
 

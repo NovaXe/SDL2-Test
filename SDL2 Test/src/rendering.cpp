@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <tuple>
 #include <string>
+#include <math.h>
 
 #include "../headers/rendering.h"
 
@@ -152,6 +153,24 @@ std::tuple<int, int> Texture::getDimensions()
 	return std::tuple<int, int>(this->width, this->height);
 }
 
+void AnimatedSprite::renderAt(int x, int y, float angle, SDL_RendererFlip flip, bool animated) {
+	//int total_frames = this->width / this->frame_width;
+	static int render_count = 0;
+	int current_frame = floor(render_count / 4);
+
+
+	SDL_Rect clip = { this->frame_width * current_frame, 0, this->frame_width, this->frame_height };
+
+	if (animated) {
+		render_count++;
+	}
+	if (render_count / 4 >= this->frames) {
+		render_count = 0;
+	}
+
+
+	Texture::renderAt(x, y, &clip, 0, flip);
+}
 
 
 //Renderer::Renderer(SDL_Renderer_PTR renderer)

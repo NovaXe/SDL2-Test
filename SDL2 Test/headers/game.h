@@ -27,6 +27,7 @@ private:
 	std::unique_ptr<Player> player;
 	std::vector<std::unique_ptr<Texture>> images;
 	std::unordered_map<std::string, std::unique_ptr<Texture>> sprites;
+	std::unordered_map<std::string, std::shared_ptr<AnimatedSprite>> animated_sprites;
 
 
 	int current_image;
@@ -38,7 +39,7 @@ private:
 		Game,
 		Image_Cycle,
 	};
-	Screens current_screen;
+	//Screens current_screen;
 
 
 public:
